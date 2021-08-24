@@ -26,7 +26,7 @@ namespace ServeLog.Models
         /// The register Level
         /// </summary>
         [Required]
-        [StringLength(50, MinimumLength = 5)]
+        [StringLength(50, MinimumLength = 4)]
         public string Level { get; set; }
 
         /// <summary>
