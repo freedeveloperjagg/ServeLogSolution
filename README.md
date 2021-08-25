@@ -13,5 +13,14 @@ Some advantages are:
 * ServeLog is tailored to use Microsoft SQL Server to store the information. Then you need it
 * We are testing it using IIS, but you can install it whatever web server that support NET 5.0
 
+# Installation
+
+* Create first the necessary Dstabases. By default you need to create the Table para el internal log
+* It is recomendable create a DB specific for all Client tables.
+* The internal table by default is named TestLog, but you can use other name if you update the appsettings.json according
+* Use the script in the code DataBaseScript.sql to generate your tables. Configure el script before use it.
+
+
+
 # Documentation
 
