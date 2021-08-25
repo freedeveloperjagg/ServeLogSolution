@@ -5,9 +5,14 @@ VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeLog", "ServeLog\ServeLog.csproj", "{BF9D6A11-FC34-4330-B40B-7B8F6AEC97CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{FE761C6E-025A-4140-8178-1E2E99AB9E54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{FE761C6E-025A-4140-8178-1E2E99AB9E54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIntegration", "TestIntegration\TestIntegration.csproj", "{29FC7034-123A-49A0-B164-CA68CA201616}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestIntegration", "TestIntegration\TestIntegration.csproj", "{29FC7034-123A-49A0-B164-CA68CA201616}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{877E3E8E-4B18-4495-9AF8-05F3976B138E}"
+	ProjectSection(SolutionItems) = preProject
+		DataBaseScript.sql = DataBaseScript.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
