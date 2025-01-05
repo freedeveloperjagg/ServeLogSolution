@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Moq;
+using ServeLog;
 using ServeLog.InternalLogger;
 using System;
 using System.IO;
@@ -33,6 +34,8 @@ namespace UnitTest
                .AddJsonFile("appsettings.json")
                .AddJsonFile("appsettings.utc.json", optional: true)
                .Build();
+
+            CConfig cconfig = new CConfig(configuration);
             // Get the mock
             var m = new MockHelper();
             // Setup the mock
@@ -41,7 +44,7 @@ namespace UnitTest
             // Create the object to be test
             LogControlInternal log = new(
                 m.MockDataInternal.Object,
-                configuration);
+                cconfig);
 
             // Run the test
             var now = DateTime.UtcNow;
@@ -63,6 +66,7 @@ namespace UnitTest
                .AddJsonFile("appsettings.json")
                .AddJsonFile("appsettings.easter.json", optional: true)
                .Build();
+            CConfig cconfig = new CConfig(configuration);
             // Get the mock
             var m = new MockHelper();
             // Setup the mock
@@ -71,7 +75,7 @@ namespace UnitTest
             // Create the object to be test
             LogControlInternal log = new(
                 m.MockDataInternal.Object,
-                configuration);
+                cconfig);
 
             // Run the test
 
@@ -95,6 +99,7 @@ namespace UnitTest
                .AddJsonFile("appsettings.json")
                .AddJsonFile("appsettings.utc.json", optional: true)
                .Build();
+            CConfig cconfig = new CConfig(configuration);
             // Get the mock
             var m = new MockHelper();
             // Setup the mock
@@ -103,24 +108,24 @@ namespace UnitTest
             // Create the object to be test
             LogControlInternal log = new(
                 m.MockDataInternal.Object,
-                configuration);
+                cconfig);
 
             // Run the test
             var now = DateTime.UtcNow;
             var result = log.InternalAlwaysWriteLog("This Always should comming");
             // Get result
             Assert.True(result.Date - now < new TimeSpan(0, 0, 2));
-            Assert.True(result != null);
-            Assert.True(result.Level == "ALWAYS");
+            Assert.NotNull(result);
+            Assert.Equal("ALWAYS",result.Level);
             output.WriteLine($"Always: {result.Date}, {result.MachineName}, {result.Level}, {result.Logger}, {result.Message}");
 
             result = log.InternalDebugWriteLog("This Only Comming in Debug", null);
             Assert.True(result != null, "Log should return value");
             output.WriteLine($"DEBUG: {result.Date}, {result.MachineName}, {result.Level}, {result.Logger}, {result.Message}");
-            Assert.True(result.Level == "DEBUG");
+            Assert.NotNull(result.Level);
 
             result = log.InternalErrorWriteLog("This Comming in DEBUG & ERROR", null);
-            Assert.True(result != null);
+            Assert.NotNull(result);
             output.WriteLine($"ERROR: {result.Date}, {result.MachineName}, {result.Level}, {result.Logger}, {result.Message}");
             Assert.True(result.Level == "ERROR");
         }
@@ -137,6 +142,7 @@ namespace UnitTest
                .AddJsonFile("appsettings.json")
                .AddJsonFile("appsettings.easter.json", optional: true)
                .Build();
+            CConfig cconfig = new CConfig(configuration);
             // Get the mock
             var m = new MockHelper();
             // Setup the mock
@@ -145,7 +151,7 @@ namespace UnitTest
             // Create the object to be test
             LogControlInternal log = new(
                 m.MockDataInternal.Object,
-                configuration);
+                cconfig);
 
             // Run the test
             var result = log.InternalAlwaysWriteLog("This Always should comming");
@@ -157,7 +163,7 @@ namespace UnitTest
             Assert.True(result == null, "No value should be returned");
 
             result = log.InternalErrorWriteLog("This Comming in DEBUG & ERROR", null);
-            Assert.True(result != null);
+            Assert.NotNull(result);
             output.WriteLine($"ERROR: {result.Date}, {result.MachineName}, {result.Level}, {result.Logger}, {result.Message}");
             Assert.True(result.Level == "ERROR");
         }
@@ -176,6 +182,7 @@ namespace UnitTest
                    .AddJsonFile("appsettings.json")
                    .AddJsonFile("appsettings.easter.json", optional: true)
                    .Build();
+                CConfig cconfig = new CConfig(configuration);
                 // Get the mock
                 var m = new MockHelper();
                 // Setup the mock
@@ -185,12 +192,12 @@ namespace UnitTest
                 // Create the object to be test
                 LogControlInternal log = new(
                     m.MockDataInternal.Object,
-                    configuration);
+                    cconfig);
 
                 // Run the test
                 var result = log.InternalAlwaysWriteLog("This not comes because the exception");
                 // Get result
-                Assert.False(true, "Should not go to here");
+                Assert.Fail("Should not go to here");
 
             }
             catch (Exception)

@@ -11,11 +11,11 @@ namespace ServeLog.Data
     /// </summary>
     public class LogServices : ILogServices
     {
-        private readonly IConfiguration configuration;
+        private readonly CConfig cconfig;
 
-        public LogServices(IConfiguration configuration)
+        public LogServices(CConfig xconfig)
         {
-            this.configuration = configuration;
+            this.cconfig = xconfig;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace ServeLog.Data
         public void WriteRecordInLog(LoggerModel model)
         {
             // Call conection string
-            var connString = configuration.GetConnectionString("ApiLoggerDb");
+            var connString = cconfig.ApiLoggerDb;
 
             // Get the specific table to be logged
             var validToken = Settings.LogTables.TryGetValue(model.Logger, out string table);

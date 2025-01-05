@@ -33,10 +33,10 @@ namespace ServeLog.Bo
         /// Constructor
         /// </summary>
         /// <param name="service"></param>
-        public LogBo(IConfiguration config, ILogServices service)
+        public LogBo(CConfig xconfig, ILogServices service)
         {
             this.service = service;
-            string timezoneSetting = config["TimeZone"];
+            string timezoneSetting = xconfig.LogSettings.TimeZone;
             this.timeZone = TimeZoneInfo.FindSystemTimeZoneById(timezoneSetting);
         }
 

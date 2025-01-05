@@ -12,10 +12,10 @@ namespace ServeLog.InternalLogger
         private readonly string connString;
         private readonly string table;
 
-        public DataInternal(IConfiguration configuration)
+        public DataInternal(CConfig xconfig)
         {
-            this.connString = configuration.GetConnectionString("InternalLoggerDb");
-            this.table = configuration["InternalLogSettings:Table"];
+            this.connString = xconfig.InternalLoggerDb;
+            this.table = xconfig.InternalLogSettings.Table;
         }
 
         /// <summary>

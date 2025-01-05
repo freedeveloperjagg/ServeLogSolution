@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using ServeLog.Model;
 using System;
 using WapiLogger.Models;
 
@@ -14,7 +15,7 @@ namespace ServeLog.InternalLogger
         /// <summary>
         /// Configuration
         /// </summary>
-        private readonly IConfiguration config;
+        private readonly CConfig cconfig;
 
         private readonly TimeZoneInfo timeZone;
 
@@ -23,11 +24,11 @@ namespace ServeLog.InternalLogger
         /// </summary>
         /// <param name="intData">Data Internal Class to communicate with DB</param>
         /// <param name="config">Configuration settings</param>
-        public LogControlInternal(IDataInternal intData, IConfiguration config)
+        public LogControlInternal(IDataInternal intData, CConfig xconfig)
         {
             this.intData = intData;
-            this.config = config;
-            string timezoneSetting = config["InternalLogSettings:TimeZone"];
+            this.cconfig = xconfig;
+            string timezoneSetting = xconfig.InternalLogSettings.TimeZone;
             this.timeZone = TimeZoneInfo.FindSystemTimeZoneById(timezoneSetting);
         }
 
@@ -41,8 +42,8 @@ namespace ServeLog.InternalLogger
         {
             try
             {
-                var level = config["InternalLogSettings:Level"].ToUpper();
-                if (level == "DEBUG")
+                var level = cconfig.InternalLogSettings.LogLevel;
+                if (level == LogLevelEnum.DEBUG)
                 {
 
                     LoggerModel model = new()
@@ -100,8 +101,8 @@ namespace ServeLog.InternalLogger
         {
             try
             {
-                var level = config["InternalLogSettings:Level"].ToUpper();
-                if (level == "ERROR" || level == "DEBUG")
+                var level = cconfig.InternalLogSettings.LogLevel;
+                if (level == LogLevelEnum.ERROR || level == LogLevelEnum.DEBUG)
                 {
                     string excep = message ?? exception?.Message;
                     LoggerModel model = new()

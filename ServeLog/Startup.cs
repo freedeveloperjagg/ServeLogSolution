@@ -92,7 +92,7 @@ namespace ServeLog
                 .AddCheck<DataBaseHealthCheck>("Database");
 
             // Configure Internal Logger
-            this.data = new DataInternal(configuration);
+            this.data = new DataInternal(cconfig);
             this.logger = new LogControlInternal(this.data, configuration);
             services.AddSingleton<IDataInternal, DataInternal>();
             services.AddSingleton<ILogControlInternal, LogControlInternal>();

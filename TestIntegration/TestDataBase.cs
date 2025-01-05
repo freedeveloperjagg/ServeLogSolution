@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using ServeLog;
 using ServeLog.InternalLogger;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,10 @@ namespace TestIntegration
                .AddJsonFile("appsettings.Test.json", optional: true)
                .Build();
 
+            CConfig cconfig = new CConfig(configuration);
+
             // Create the class
-            IDataInternal data = new DataInternal(configuration);
+            IDataInternal data = new DataInternal(cconfig);
 
             // Create the data
             var date = DateTime.UtcNow;
@@ -47,7 +50,7 @@ namespace TestIntegration
             data.WriteRecordInLog(model);
 
             // Assert
-            string strConn = configuration.GetConnectionString("InternalLoggerDb");
+            string strConn = cconfig.InternalLoggerDb;
             string sql = $"SELECT * FROM ServeLog WHERE Date = @Param";
             SqlConnection conn = new(strConn);
             SqlCommand command = new(sql, conn);
