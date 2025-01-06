@@ -1,28 +1,23 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Servelog.Infrastructure.HealthCheck.Helpers;
+using ServeLog.Infrastructure.HealthCheck.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Servelog.Infrastructure.HealthCheck
+namespace ServeLog.Infrastructure.HealthCheck
 {
     /// <summary>
     /// MemoryHealthCheck custom Check
     /// </summary>
-    public class MemoryHealthCheck : IHealthCheck
+    /// <remarks>
+    /// Constructor
+    /// </remarks>
+    /// <param name="options"></param>
+    public class MemoryHealthCheck(IOptionsMonitor<MemoryCheckOptions> options) : IHealthCheck
     {
-        private readonly IOptionsMonitor<MemoryCheckOptions> options;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="options"></param>
-        public MemoryHealthCheck(IOptionsMonitor<MemoryCheckOptions> options)
-        {
-            this.options = options;
-        }
+        private readonly IOptionsMonitor<MemoryCheckOptions> options = options;
 
         /// <summary>
         /// Check name

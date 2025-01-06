@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Servelog.Infrastructure.HealthCheck
+namespace ServeLog.Infrastructure.HealthCheck
 {
     /// <summary>
     /// Checking the assembly version
@@ -24,8 +24,8 @@ namespace Servelog.Infrastructure.HealthCheck
         /// <returns></returns>
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var version = Assembly.GetEntryAssembly().GetName().FullName;
-            var infoVersion = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+            var version = Assembly.GetEntryAssembly()?.GetName().FullName ?? "Not Found";
+            var infoVersion = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Not Found";
             var data = new Dictionary<string, object>()
             {
                 { "AssemblyVersion", version.ToString() },
@@ -33,11 +33,11 @@ namespace Servelog.Infrastructure.HealthCheck
             };
 
             var status = HealthStatus.Healthy;
-           return Task.FromResult(new HealthCheckResult(
-                status,
-                description: $"Assembly: {version} Info Version: {infoVersion}",
-                exception: null,
-                data: data));
+            return Task.FromResult(new HealthCheckResult(
+                 status,
+                 description: $"Assembly: {version} Info Version: {infoVersion}",
+                 exception: null,
+                 data: data));
         }
     }
 }

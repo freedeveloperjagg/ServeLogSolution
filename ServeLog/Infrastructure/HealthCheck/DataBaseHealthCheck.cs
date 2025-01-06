@@ -1,21 +1,26 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Servelog.Infrastructure.HealthCheck.Extensions;
+using ServeLog.Infrastructure.HealthCheck.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Servelog.Infrastructure.HealthCheck
-{ 
+namespace ServeLog.Infrastructure.HealthCheck
+{
+    /// <summary>
+    /// Test for DB connection
+    /// </summary>
     public class DataBaseHealthCheck : ConfigurationHealthCheck
     {
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="config"></param>
         public DataBaseHealthCheck(IConfiguration config) : base(config)
         {
-            this.config = config;
+            this.Config = config;
             this.Name = "DataBase";
         }
 
@@ -31,9 +36,9 @@ namespace Servelog.Infrastructure.HealthCheck
             {
                 var status = HealthStatus.Healthy;
                 var description = "Config found";
-                Exception exception = null;
+                Exception? exception = null;
                 var data = new Dictionary<string, object>();
-                if (config == null)
+                if (Config == null)
                 {
                     status = HealthStatus.Unhealthy;
                     description = "Configuration is null";
@@ -42,7 +47,7 @@ namespace Servelog.Infrastructure.HealthCheck
                 else
                 {
                     // Test the configuration
-                    var connLogger = config.GetConnectionString("ApiLoggerDb");
+                    var connLogger = Config.GetConnectionString("ApiLoggerDb");
                     SqlConnectionStringBuilder builder = new()
                     {
                         ConnectionString = connLogger
@@ -70,7 +75,7 @@ namespace Servelog.Infrastructure.HealthCheck
                         conn.Close();
                     }
                     // Test second database
-                    connLogger = config.GetConnectionString("InternalLoggerDb");
+                    connLogger = Config.GetConnectionString("InternalLoggerDb");
                     builder = new SqlConnectionStringBuilder
                     {
                         ConnectionString = connLogger

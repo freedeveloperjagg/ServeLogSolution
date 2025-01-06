@@ -1,0 +1,597 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ServeLog</name>
+    </assembly>
+    <members>
+        <member name="T:ServeLog.Bo.ILogBo">
+            <summary>
+            Interfaz for business Object
+            </summary>
+        </member>
+        <member name="M:ServeLog.Bo.ILogBo.PostLogEntryAsync(ServeLog.Model.LogRequest)">
+            <summary>
+            Ue this to post the logger to the service
+            </summary>
+            <param name="request">the object to be logged</param>
+            <returns>a empty task the method is run and forget.</returns>
+        </member>
+        <member name="T:ServeLog.Bo.LogBo">
+            <summary>
+            Business object to write logs
+            </summary>
+        </member>
+        <member name="F:ServeLog.Bo.LogBo.service">
+            <summary>
+            Logger Service
+            </summary>
+        </member>
+        <member name="F:ServeLog.Bo.LogBo.tokenCancel">
+            <summary>
+            Cancelation Token Source
+            </summary>
+        </member>
+        <member name="F:ServeLog.Bo.LogBo.timeZone">
+            <summary>
+            Time Zone info
+            </summary>
+        </member>
+        <member name="M:ServeLog.Bo.LogBo.#ctor(ServeLog.CConfig,ServeLog.Data.ILogServices)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="xconfig">the configuration file</param>
+            <param name="service"></param>
+        </member>
+        <member name="M:ServeLog.Bo.LogBo.PostLogEntryAsync(ServeLog.Model.LogRequest)">
+            <summary>
+            Post the log entry. Operation must be completed in less than 60 second
+            </summary>
+            <param name="request"></param>
+            <remark>
+            Cancellation token guarantee that a connection pool does not get trapped forever
+            </remark>
+        </member>
+        <member name="M:ServeLog.Bo.LogBo.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:ServeLog.CConfig">
+            <summary>
+            Program Settings
+            This program check for each setting and store it in memeory
+            </summary>
+            <param name="config">The program config</param>
+        </member>
+        <member name="M:ServeLog.CConfig.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Program Settings
+            This program check for each setting and store it in memeory
+            </summary>
+            <param name="config">The program config</param>
+        </member>
+        <member name="P:ServeLog.CConfig.Environment">
+            <summary>
+            NET Environment
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.Version">
+            <summary>
+            Program Version
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.AllowedHosts">
+            <summary>
+            Allowed Hosts
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.LogSettings">
+            <summary>
+            Settings of the logger program
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.InternalLogSettings">
+            <summary>
+            Settings for the internal Logger. the internal logger log errors that happen inside 
+            the logger itself, for example bad requests, false token or tables.
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.CorsSettings">
+            <summary>
+            The Cors Settings
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.Tables">
+            <summary>
+            Dictionary holding the token and the table that match with the token
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.ApiLoggerDb">
+            <summary>
+            The Connection string to logger the information
+            </summary>
+        </member>
+        <member name="P:ServeLog.CConfig.InternalLoggerDb">
+            <summary>
+            The connection string for the internal logger. Can be the same that the ApiLoggerDB
+            </summary>
+        </member>
+        <member name="T:ServeLog.Controllers.LogController">
+            <summary>
+            The Logger Controller
+            </summary>
+        </member>
+        <member name="M:ServeLog.Controllers.LogController.#ctor(ServeLog.Bo.ILogBo)">
+            <summary>
+            The Logger Controller
+            </summary>
+        </member>
+        <member name="M:ServeLog.Controllers.LogController.GetAlive">
+            <summary>
+            Simple method to test if the log is alive
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ServeLog.Controllers.LogController.PostLogEntryAsync(ServeLog.Model.LogRequest)">
+            <summary>
+            Enter the info in the log.
+            if error return a http 500 internal server error 
+            and a HttpError based in the exception information
+            </summary>
+            <param name="request">
+            The information to be logged
+            </param>
+            <returns>null is ok</returns>
+            <exception>If error return a httpError Class</exception>
+        </member>
+        <member name="T:ServeLog.Data.ILogServices">
+            <summary>
+            Services available to log program
+            </summary>
+        </member>
+        <member name="M:ServeLog.Data.ILogServices.WriteRecordInLog(ServeLog.Model.LoggerModel)">
+            <summary>
+            Write record in Logger
+            </summary>
+            <param name="model"></param>
+        </member>
+        <member name="T:ServeLog.Data.LogServices">
+            <summary>
+            Call the necessary services to Manage the log table
+            </summary>
+        </member>
+        <member name="M:ServeLog.Data.LogServices.#ctor(ServeLog.CConfig)">
+            <summary>
+            Call the necessary services to Manage the log table
+            </summary>
+        </member>
+        <member name="M:ServeLog.Data.LogServices.WriteRecordInLog(ServeLog.Model.LoggerModel)">
+            <summary>
+            Write the log in the table. The table is selected by the
+            value of the appConfig that match with request.Logger
+            </summary>
+            <param name="model">
+            Logger: Must match the AppSetting with the name of the table to  log
+            or the method fail.
+            </param>
+        </member>
+        <member name="M:ServeLog.Data.LogServices.InsertingLogRecord(ServeLog.Model.LoggerModel,System.String,System.String)">
+            <summary>
+            Inserting the record
+            </summary>
+            <param name="model">The information to be logged</param>
+            <param name="connString">The connection string to DB</param>
+            <param name="table">The table to be used for log</param>
+        </member>
+        <member name="T:ServeLog.Infrastructure.HealthCheck.DataBaseHealthCheck">
+            <summary>
+            Test for DB connection
+            </summary>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.DataBaseHealthCheck.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="config"></param>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.DataBaseHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext,System.Threading.CancellationToken)">
+            <summary>
+            Check the configuration of the DB and in the future the network connection
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheck">
+            <summary>
+            Base class for all HealthCheck that use configuration
+            </summary>
+            <remarks>
+            Constructor
+            </remarks>
+            <param name="config"></param>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheck.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Base class for all HealthCheck that use configuration
+            </summary>
+            <remarks>
+            Constructor
+            </remarks>
+            <param name="config"></param>
+        </member>
+        <member name="P:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheck.Name">
+            <summary>
+            Health Check implementation Name
+            </summary>
+        </member>
+        <member name="P:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheck.Config">
+            <summary>
+            Protected configuration
+            </summary>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext,System.Threading.CancellationToken)">
+            <summary>
+            This is a base class is not override check if the config is in place
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheckExtensions">
+            <summary>
+            Extension to be able to intereact with the Http and the Configuration file
+            </summary>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheckExtensions.AddConfigurationHealthCheck(Microsoft.Extensions.DependencyInjection.IHealthChecksBuilder,ServeLog.Infrastructure.HealthCheck.Extensions.ConfigurationHealthCheck,System.String,System.Nullable{Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus},System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Health Check Builder allowing to creating descendant that used config file
+            </summary>
+            <param name="builder"></param>
+            <param name="hCheck"></param>
+            <param name="name"></param>
+            <param name="failureStatus"></param>
+            <param name="tags"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.Infrastructure.HealthCheck.Helpers.MemoryCheckOptions">
+            <summary>
+            Memory Check Options
+            </summary>
+        </member>
+        <member name="P:ServeLog.Infrastructure.HealthCheck.Helpers.MemoryCheckOptions.Threshold">
+            <summary>
+            Failure Threshold (bytes)
+            </summary>
+        </member>
+        <member name="T:ServeLog.Infrastructure.HealthCheck.MemoryHealthCheck">
+            <summary>
+            MemoryHealthCheck custom Check
+            </summary>
+            <remarks>
+            Constructor
+            </remarks>
+            <param name="options"></param>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.MemoryHealthCheck.#ctor(Microsoft.Extensions.Options.IOptionsMonitor{ServeLog.Infrastructure.HealthCheck.Helpers.MemoryCheckOptions})">
+            <summary>
+            MemoryHealthCheck custom Check
+            </summary>
+            <remarks>
+            Constructor
+            </remarks>
+            <param name="options"></param>
+        </member>
+        <member name="P:ServeLog.Infrastructure.HealthCheck.MemoryHealthCheck.Name">
+            <summary>
+            Check name
+            </summary>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.MemoryHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext,System.Threading.CancellationToken)">
+            <summary>
+            This talk check the Health of the memory in the applicatiob
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.Infrastructure.HealthCheck.VersionHealthCheck">
+            <summary>
+            Checking the assembly version
+            </summary>
+        </member>
+        <member name="P:ServeLog.Infrastructure.HealthCheck.VersionHealthCheck.Name">
+            <summary>
+            Check name
+            </summary>
+        </member>
+        <member name="M:ServeLog.Infrastructure.HealthCheck.VersionHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext,System.Threading.CancellationToken)">
+            <summary>
+            Helath Check Async
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.InternalLogger.DataInternal">
+            <summary>
+            Call the necessary services to Manage the log table
+            </summary>
+        </member>
+        <member name="M:ServeLog.InternalLogger.DataInternal.#ctor(ServeLog.CConfig)">
+            <summary>
+            Call the necessary services to Manage the log table
+            </summary>
+        </member>
+        <member name="M:ServeLog.InternalLogger.DataInternal.WriteRecordInLog(ServeLog.Model.LoggerModel)">
+            <summary>
+            Write the log in the table. The table is selected by the
+            value of the appConfig that match with request.Logger
+            </summary>
+            <param name="model">
+            Logger: Must match the AppSetting with the name of the table to  log
+            or the method fail.
+            </param>
+        </member>
+        <member name="T:ServeLog.InternalLogger.IDataInternal">
+            <summary>
+            IDataInternal
+            </summary>
+        </member>
+        <member name="M:ServeLog.InternalLogger.IDataInternal.WriteRecordInLog(ServeLog.Model.LoggerModel)">
+            <summary>
+            Write the log information in the table
+            </summary>
+            <param name="model"></param>
+        </member>
+        <member name="T:ServeLog.InternalLogger.ILogControlInternal">
+            <summary>
+            Interfaz for Internal Logger.
+            </summary>
+        </member>
+        <member name="M:ServeLog.InternalLogger.ILogControlInternal.InternalAlwaysWriteLog(System.String)">
+            <summary>
+            This method always write information in the Tale
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServeLog.InternalLogger.ILogControlInternal.InternalDebugWriteLog(System.String,System.String)">
+            <summary>
+            This write if debug is activate in the settings LEVEL
+            </summary>
+            <param name="message"></param>
+            <param name="exceptionText"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServeLog.InternalLogger.ILogControlInternal.InternalErrorWriteLog(System.String,System.Exception)">
+            <summary>
+            This write in table if LEVEL is ERROR or higher
+            </summary>
+            <param name="message"></param>
+            <param name="exception"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.InternalLogger.LogControlInternal">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:ServeLog.InternalLogger.LogControlInternal.intData">
+            <summary>
+            Internal data communication for logger
+            </summary>
+        </member>
+        <member name="F:ServeLog.InternalLogger.LogControlInternal.cconfig">
+            <summary>
+            Configuration
+            </summary>
+        </member>
+        <member name="M:ServeLog.InternalLogger.LogControlInternal.#ctor(ServeLog.InternalLogger.IDataInternal,ServeLog.CConfig)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="intData">Data Internal Class to communicate with DB</param>
+            <param name="xconfig">Configuration settings</param>
+        </member>
+        <member name="M:ServeLog.InternalLogger.LogControlInternal.InternalDebugWriteLog(System.String,System.String)">
+            <summary>
+            This write a INFO level information in the logger
+            </summary>
+            <param name="message"></param>
+            <param name="exceptionText"></param>
+        </member>
+        <member name="M:ServeLog.InternalLogger.LogControlInternal.InternalAlwaysWriteLog(System.String)">
+            <summary>
+            Always write in the table when is invoked
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServeLog.InternalLogger.LogControlInternal.InternalErrorWriteLog(System.String,System.Exception)">
+            <summary>
+            This write a INFO level information in the logger
+            </summary>
+        </member>
+        <member name="T:ServeLog.Model.ErrorManager">
+            <summary>
+            Error Message
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.ErrorManager.DateCreated">
+            <summary>
+            This link the log record with the error
+            message
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.ErrorManager.Errors">
+            <summary>
+            List of Validations or internal Errors
+            Used to reported error conditions that does
+            not raise exceptions. Normally Error 400 Type
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.ErrorManager.Description">
+            <summary>
+            Friendly description, Reserved for
+            Exceptions raised Errors type 500
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.ErrorManager.StackTrace">
+            <summary>
+            This is the technological Error, should only be
+            used in non production environment.
+            Must be empty in production
+            </summary>
+        </member>
+        <member name="M:ServeLog.Model.ErrorManager.Factory">
+            <summary>
+            Return a initializated error Manager
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:ServeLog.Model.ErrorResponse">
+            <summary>
+            Hold 400 type errors
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.ErrorResponse.Code">
+            <summary>
+            Can be a numeric code
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.ErrorResponse.Description">
+            <summary>
+            Description of the error, can be a
+            portion of the stack trace.
+            </summary>
+        </member>
+        <member name="T:ServeLog.Model.LoggerModel">
+            <summary>
+            Logger Model
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LoggerModel.Date">
+            <summary>
+            Log Date
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LoggerModel.MachineName">
+            <summary>
+            This is used to enter the Machine name that
+            create the log.
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LoggerModel.Level">
+            <summary>
+            The register Level
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LoggerModel.Logger">
+            <summary>
+            The name of the logger
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LoggerModel.Message">
+            <summary>
+            The message to be show
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LoggerModel.Exception">
+            <summary>
+            The exception to be logged
+            </summary>
+        </member>
+        <member name="T:ServeLog.Model.LogLevelEnumeration">
+            <summary>
+            Log Level Internal Enum
+            </summary>
+        </member>
+        <member name="T:ServeLog.Model.LogRequest">
+            <summary>
+            The Log Request Class
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogRequest.CreatedDate">
+            <summary>
+            Used to link the error to the user with the log 
+            logged
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogRequest.MachineName">
+            <summary>
+            The name of the machine where log is emitted
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogRequest.Level">
+            <summary>
+            The register Level
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogRequest.Logger">
+            <summary>
+            The name of the logger
+            Don't touch this!! this name is used to localize the log table.
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogRequest.Message">
+            <summary>
+            The message to be show
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogRequest.Exception">
+            <summary>
+            The exception Message to be logged
+            </summary>
+        </member>
+        <member name="T:ServeLog.Model.LogSettings">
+            <summary>
+            Settings to configure the Logger works
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogSettings.UseInternalDateTime">
+            <summary>
+            true the logger time is set by itself
+            false the logger time must comes from the client
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogSettings.TimeZone">
+            <summary>
+            The Datetime zone use: Values can be:
+            UTC, Eastern Standard Time, or other valid zone.
+            </summary>
+        </member>
+        <member name="P:ServeLog.Model.LogSettings.TaskCancellationTimeMs">
+            <summary>
+            Time set to cancel a pending operation. Important to avoid freeze the logger
+            </summary>
+        </member>
+        <member name="T:ServeLog.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:ServeLog.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:ServeLog.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:ServeLog.SanitizeLoggerModel">
+            <summary>
+            Sanitize the logger model to avoid errors in the DB write.
+            </summary>
+        </member>
+        <member name="M:ServeLog.SanitizeLoggerModel.Execute(ServeLog.Model.LoggerModel)">
+            <summary>
+            Sanitize the logger model
+            </summary>
+            <param name="model">The model to be sanitize</param>
+            <returns>Model sanitized</returns>
+        </member>
+    </members>
+</doc>

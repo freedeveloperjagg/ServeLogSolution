@@ -1,24 +1,19 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using ServeLog;
 using ServeLog.InternalLogger;
+using ServeLog.Model;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
-using WapiLogger.Models;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace TestIntegration
 {
-    public class TestDataBase
+    public class TestDataBase(ITestOutputHelper output)
     {
-        private readonly ITestOutputHelper output;
-
-        public TestDataBase(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        private readonly ITestOutputHelper output = output;
 
         [Fact]
         public void TestInternalDbProcedure()
@@ -29,10 +24,10 @@ namespace TestIntegration
                .AddJsonFile("appsettings.Test.json", optional: true)
                .Build();
 
-            CConfig cconfig = new CConfig(configuration);
+            CConfig cconfig = new(configuration);
 
             // Create the class
-            IDataInternal data = new DataInternal(cconfig);
+            DataInternal data = new(cconfig);
 
             // Create the data
             var date = DateTime.UtcNow;
@@ -58,7 +53,7 @@ namespace TestIntegration
             conn.Open();
             try
             {
-                List<LoggerModel> modelList = new();
+                List<LoggerModel> modelList = [];
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -85,7 +80,7 @@ namespace TestIntegration
             }
             catch (Exception ex)
             {
-                Assert.True(false, $"A exception happen {ex.Message}");
+                Assert.Fail($"A exception happen {ex.Message}");
             }
             finally
             {

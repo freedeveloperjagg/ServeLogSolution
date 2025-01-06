@@ -7,28 +7,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Servelog.Infrastructure.HealthCheck;
 using ServeLog;
 using ServeLog.Bo;
 using ServeLog.Data;
+using ServeLog.Infrastructure.HealthCheck;
 using ServeLog.InternalLogger;
 using ServeLog.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
-ILogControlInternal logger;
+LogControlInternal logger;
 
 var builder = WebApplication.CreateBuilder(args);
 // Here can go the Azure configuration is needed
 
 // Configuration Set
 IConfiguration configuration = builder.Configuration;
-CConfig cconfig = new CConfig(configuration);
+CConfig cconfig = new(configuration);
 
 // Inject the CConfig...
 builder.Services.AddSingleton(cconfig);
@@ -39,7 +36,18 @@ builder.Services.AddSingleton(cconfig);
 // Add Swagger........
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ServeLog", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo {
+        Title = "ServeLog", 
+        Version = cconfig.Version, 
+        Description = "REST Logger Service. Logger through a unique service.",
+        Contact = new OpenApiContact(){
+            Name = "Jose Garcia",
+            Url = new Uri("http://www.avalon-software.com")
+        }
+    });
+    var xmlfile = $"{System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name}.xml";
+    var xmlpath = Path.Combine(AppContext.BaseDirectory, xmlfile) ;
+    c.IncludeXmlComments(xmlpath);
 });
 
 // Add HealthCheck Infrastructure
@@ -65,11 +73,16 @@ builder.Services.AddControllers()
 
           foreach (var item in context.ModelState)
           {
-              messageb.Append($"Validation Failure in {context.ActionDescriptor.DisplayName} Parameter: {item.Key} Error: ");
-
+              messageb.Append("Validation Failure in");
+              messageb.Append(context.ActionDescriptor.DisplayName);
+              messageb.Append("Parameter: ");
+              messageb.Append(item.Key);
+              messageb.Append("/n/r");
+              messageb.Append("Error: ");
               foreach (var i in item.Value.Errors)
               {
-                  messageb.Append($" {i.ErrorMessage} - ");
+                  messageb.Append("/n/r");
+                  messageb.Append(i.ErrorMessage);
               }
 
               errorManager.Errors.Add(new ErrorResponse()
@@ -121,8 +134,8 @@ app.UseExceptionHandler(errorApp =>
         };
         if (!cconfig.Environment.Contains("Prod", StringComparison.CurrentCultureIgnoreCase))
         {
-            errorManager.StackTrace = errorFeature.Error.StackTrace;
-            errorManager.Description = errorFeature.Error.Message;
+            errorManager.StackTrace = errorFeature?.Error.StackTrace;
+            errorManager.Description = errorFeature?.Error.Message;
         }
         else
         {
@@ -131,7 +144,7 @@ app.UseExceptionHandler(errorApp =>
         }
 
         // Call the Logger to enter the information
-        logger.InternalErrorWriteLog(errorFeature.Error.Message, errorFeature.Error);
+        logger.InternalErrorWriteLog(errorFeature?.Error.Message ?? "Error is missing", errorFeature?.Error);
 
         // Send the response back
         string content = System.Text.Json.JsonSerializer.Serialize(errorManager);

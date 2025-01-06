@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ServeLog.Models
+namespace ServeLog.Model
 {
     /// <summary>
     /// The Log Request Class
@@ -20,14 +20,14 @@ namespace ServeLog.Models
         /// </summary>
         [Required(AllowEmptyStrings = false)]
         [StringLength(maximumLength: 255, MinimumLength = 5)]
-        public string MachineName { get; set; }
+        public string? MachineName { get; set; }
 
         /// <summary>
         /// The register Level
         /// </summary>
         [Required]
         [StringLength(50, MinimumLength = 4)]
-        public string Level { get; set; }
+        public string? Level { get; set; }
 
         /// <summary>
         /// The name of the logger
@@ -35,17 +35,17 @@ namespace ServeLog.Models
         /// </summary>
         [Required(AllowEmptyStrings = false)]
         [StringLength(maximumLength: 255, MinimumLength = 5)]
-        public string Logger { get; set; }
+        public string? Logger { get; set; }
 
         /// <summary>
         /// The message to be show
         /// </summary>
         [Required(AllowEmptyStrings = true)]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         /// <summary>
         /// The exception Message to be logged
         /// </summary>
-        public string Exception { get; set; }
+        public string? Exception { get; set; }
     }
 }

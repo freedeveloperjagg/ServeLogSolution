@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Collections.Generic;
 
-namespace Servelog.Infrastructure.HealthCheck.Extensions
+namespace ServeLog.Infrastructure.HealthCheck.Extensions
 {
     /// <summary>
     /// Extension to be able to intereact with the Http and the Configuration file
@@ -23,10 +23,10 @@ namespace Servelog.Infrastructure.HealthCheck.Extensions
         public static IHealthChecksBuilder AddConfigurationHealthCheck(
             this IHealthChecksBuilder builder,
             ConfigurationHealthCheck hCheck,
-            string name = default,
+            string? name = default,
             ////string data = "",
             HealthStatus? failureStatus = default,
-            IEnumerable<string> tags = default)
+            IEnumerable<string>? tags = default)
         {
             return builder.Add(new HealthCheckRegistration(
                 name ?? DEFAULT_NAME,

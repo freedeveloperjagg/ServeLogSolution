@@ -1,4 +1,4 @@
-﻿using WapiLogger.Models;
+﻿using ServeLog.Model;
 
 namespace ServeLog.InternalLogger
 {
@@ -7,6 +7,10 @@ namespace ServeLog.InternalLogger
     /// </summary>
     public interface IDataInternal
     {
+        /// <summary>
+        /// Write the log information in the table
+        /// </summary>
+        /// <param name="model"></param>
         void WriteRecordInLog(LoggerModel model);
     }
 }

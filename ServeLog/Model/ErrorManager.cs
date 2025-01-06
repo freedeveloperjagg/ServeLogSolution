@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace ServeLog.Model
 {
@@ -21,20 +20,20 @@ namespace ServeLog.Model
         /// Used to reported error conditions that does
         /// not raise exceptions. Normally Error 400 Type
         /// </summary>
-        public List<ErrorResponse> Errors { get; set; }
+        public List<ErrorResponse> Errors { get; set; } = [];
 
         /// <summary>
         /// Friendly description, Reserved for
         /// Exceptions raised Errors type 500
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// This is the technological Error, should only be
         /// used in non production environment.
         /// Must be empty in production
         /// </summary>
-        public string StackTrace { get; set; }
+        public string? StackTrace { get; set; }
 
         /// <summary>
         /// Return a initializated error Manager
@@ -44,7 +43,7 @@ namespace ServeLog.Model
         {
             IErrorManager manager = new ErrorManager
             {
-                Errors = new List<ErrorResponse>()
+                Errors = []
             };
             return manager;
         }
@@ -57,12 +56,12 @@ namespace ServeLog.Model
         /// <summary>
         /// Can be a numeric code
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// Description of the error, can be a
         /// portion of the stack trace.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

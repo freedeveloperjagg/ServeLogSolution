@@ -3,8 +3,9 @@
     /// <summary>
     /// Log Level Internal Enum
     /// </summary>
-    public enum LogLevelEnum
+    public enum LogLevelEnumeration
     {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         NONE = 0,
         DEBUG = 1,
         INFO = 2,

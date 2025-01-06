@@ -1,22 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Data.SqlClient;
 using ServeLog.Model;
-using System;
-using System.Data.SqlClient;
-using WapiLogger.Models;
+using System.Collections.Generic;
 
 namespace ServeLog.Data
 {
     /// <summary>
     /// Call the necessary services to Manage the log table
     /// </summary>
-    public class LogServices : ILogServices
+    public class LogServices(CConfig xconfig) : ILogServices
     {
-        private readonly CConfig cconfig;
-
-        public LogServices(CConfig xconfig)
-        {
-            this.cconfig = xconfig;
-        }
+        private readonly CConfig cconfig = xconfig;
 
         /// <summary>
         /// Write the log in the table. The table is selected by the
@@ -32,13 +25,20 @@ namespace ServeLog.Data
             var connString = cconfig.ApiLoggerDb;
 
             // Get the specific table to be logged
-            var validToken = Settings.LogTables.TryGetValue(model.Logger, out string table);
+            if (model.Logger == null)
+            {
+                throw new KeyNotFoundException($"The used token is not a valid token: {model.Logger}");
+            }
+            var validToken = cconfig.Tables.TryGetValue(model.Logger, out string? table);
             if (!validToken)
             {
-                throw new ApplicationException($"The used token is not a valid token: {model.Logger}");
+                throw new KeyNotFoundException($"The used token is not a valid token: {model.Logger}");
             }
-
-            this.InsertingLogRecord(model, connString, table);
+            if (table == null)
+            {
+                throw new KeyNotFoundException($"The retrieved table is null");
+            }
+            InsertingLogRecord(model, connString, table);
         }
 
         /// <summary>
@@ -47,11 +47,11 @@ namespace ServeLog.Data
         /// <param name="model">The information to be logged</param>
         /// <param name="connString">The connection string to DB</param>
         /// <param name="table">The table to be used for log</param>
-        public void InsertingLogRecord(LoggerModel model, string connString, string table)
+        internal static void InsertingLogRecord(LoggerModel model, string connString, string table)
         {
             // Sanitarize Model
-            model = SatinizeLoggerModel.Execute(model);
-            
+            model = SanitizeLoggerModel.Execute(model);
+
             // Prepare query
             var sql = $@"INSERT INTO {table} 
                         ([Date],[MachineName],[Level],[Logger],[Message],[Exception])
@@ -72,7 +72,7 @@ namespace ServeLog.Data
             command.Parameters.AddWithValue("@Logger", model.Logger);
             command.Parameters.AddWithValue("@Message", model.Message);
             command.Parameters.AddWithValue("@Exception", model.Exception);
-            
+
             // Open The connexion...
             conn.Open();
             try

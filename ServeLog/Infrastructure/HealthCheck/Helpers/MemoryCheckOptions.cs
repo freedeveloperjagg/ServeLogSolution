@@ -1,4 +1,4 @@
-﻿namespace Servelog.Infrastructure.HealthCheck.Helpers
+﻿namespace ServeLog.Infrastructure.HealthCheck.Helpers
 {
     /// <summary>
     /// Memory Check Options

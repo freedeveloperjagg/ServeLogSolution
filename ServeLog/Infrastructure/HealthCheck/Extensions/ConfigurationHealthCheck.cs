@@ -1,35 +1,29 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Servelog.Infrastructure.HealthCheck.Extensions
+namespace ServeLog.Infrastructure.HealthCheck.Extensions
 {
     /// <summary>
     /// Base class for all HealthCheck that use configuration
     /// </summary>
-    public class ConfigurationHealthCheck: IHealthCheck
+    /// <remarks>
+    /// Constructor
+    /// </remarks>
+    /// <param name="config"></param>
+    public class ConfigurationHealthCheck(IConfiguration config) : IHealthCheck
     {
         /// <summary>
         /// Health Check implementation Name
         /// </summary>
-        public string Name = "configuration";
+        public string Name { get; set; } = "configuration";
 
         /// <summary>
         /// Protected configuration
         /// </summary>
-        protected IConfiguration config;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="config"></param>
-        public ConfigurationHealthCheck(IConfiguration config )
-        {
-            this.config = config;
-        }
+        protected IConfiguration Config { get; set; } = config;
 
         /// <summary>
         /// This is a base class is not override check if the config is in place
@@ -41,7 +35,7 @@ namespace Servelog.Infrastructure.HealthCheck.Extensions
         {
             var status = HealthStatus.Healthy;
             var description = "Config found";
-            if (config == null)
+            if (Config == null)
             {
                 status = HealthStatus.Unhealthy;
                 description = "Configuration is null";

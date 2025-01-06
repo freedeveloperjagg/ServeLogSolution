@@ -2,9 +2,9 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using ServeLog;
 using ServeLog.InternalLogger;
+using ServeLog.Model;
 using System;
 using System.IO;
-using WapiLogger.Models;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -116,7 +116,7 @@ namespace UnitTest
             // Get result
             Assert.True(result.Date - now < new TimeSpan(0, 0, 2));
             Assert.NotNull(result);
-            Assert.Equal("ALWAYS",result.Level);
+            Assert.Equal("ALWAYS", result.Level);
             output.WriteLine($"Always: {result.Date}, {result.MachineName}, {result.Level}, {result.Logger}, {result.Message}");
 
             result = log.InternalDebugWriteLog("This Only Comming in Debug", null);

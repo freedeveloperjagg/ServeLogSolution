@@ -1,18 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
-using ServeLog.Data;
+﻿using ServeLog.Data;
 using ServeLog.Model;
-using ServeLog.Models;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using WapiLogger.Models;
 
 namespace ServeLog.Bo
 {
     /// <summary>
     /// Business object to write logs
     /// </summary>
-    public class LogBo : ILogBo
+    public class LogBo : ILogBo, IDisposable
     {
         /// <summary>
         /// Logger Service
@@ -22,7 +19,9 @@ namespace ServeLog.Bo
         /// <summary>
         /// Cancelation Token Source
         /// </summary>
-        private CancellationTokenSource tokenCancel;
+        private CancellationTokenSource? tokenCancel;
+
+        private readonly CConfig cconfig;
 
         /// <summary>
         /// Time Zone info
@@ -32,10 +31,12 @@ namespace ServeLog.Bo
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="xconfig">the configuration file</param>
         /// <param name="service"></param>
         public LogBo(CConfig xconfig, ILogServices service)
         {
             this.service = service;
+            this.cconfig = xconfig;
             string timezoneSetting = xconfig.LogSettings.TimeZone;
             this.timeZone = TimeZoneInfo.FindSystemTimeZoneById(timezoneSetting);
         }
@@ -49,7 +50,7 @@ namespace ServeLog.Bo
         /// </remark>
         public Task PostLogEntryAsync(LogRequest request)
         {
-            var cancelationMiliseconds = Settings.TaskCancellationTimeMs;
+            var cancelationMiliseconds = cconfig.LogSettings.TaskCancellationTimeMs;
             this.tokenCancel = new CancellationTokenSource(cancelationMiliseconds);
             var token = tokenCancel.Token;
             var t = Task.Run(() =>
@@ -70,6 +71,13 @@ namespace ServeLog.Bo
              }, token);
 
             return t;
+        }
+/// <inheritdoc/>
+
+        public void Dispose()
+        {
+            tokenCancel?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

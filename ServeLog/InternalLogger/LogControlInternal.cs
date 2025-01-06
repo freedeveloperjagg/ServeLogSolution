@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
-using ServeLog.Model;
+﻿using ServeLog.Model;
 using System;
-using WapiLogger.Models;
 
 namespace ServeLog.InternalLogger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class LogControlInternal : ILogControlInternal
     {
         /// <summary>
@@ -23,29 +24,27 @@ namespace ServeLog.InternalLogger
         /// Constructor
         /// </summary>
         /// <param name="intData">Data Internal Class to communicate with DB</param>
-        /// <param name="config">Configuration settings</param>
+        /// <param name="xconfig">Configuration settings</param>
         public LogControlInternal(IDataInternal intData, CConfig xconfig)
         {
             this.intData = intData;
             this.cconfig = xconfig;
-            string timezoneSetting = xconfig.InternalLogSettings.TimeZone;
+            string timezoneSetting = xconfig.InternalLogSettings.TimeZone ?? "UTC";
             this.timeZone = TimeZoneInfo.FindSystemTimeZoneById(timezoneSetting);
         }
 
         /// <summary>
         /// This write a INFO level information in the logger
         /// </summary>
-        /// <param name="model">
-        /// The information to be stored.
-        /// </param>
-        public LoggerModel InternalDebugWriteLog(string message, string exceptionText)
+        /// <param name="message"></param>
+        /// <param name="exceptionText"></param>
+        public LoggerModel? InternalDebugWriteLog(string message, string exceptionText)
         {
             try
             {
                 var level = cconfig.InternalLogSettings.LogLevel;
-                if (level == LogLevelEnum.DEBUG)
+                if (level == LogLevelEnumeration.DEBUG)
                 {
-
                     LoggerModel model = new()
                     {
                         Date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, this.timeZone),
@@ -67,7 +66,12 @@ namespace ServeLog.InternalLogger
             return null;
         }
 
-        public LoggerModel InternalAlwaysWriteLog(string message)
+        /// <summary>
+        /// Always write in the table when is invoked
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public LoggerModel? InternalAlwaysWriteLog(string message)
         {
             try
             {
@@ -94,17 +98,14 @@ namespace ServeLog.InternalLogger
         /// <summary>
         /// This write a INFO level information in the logger
         /// </summary>
-        /// <param name="model">
-        /// The information to be stored.
-        /// </param>
-        public LoggerModel InternalErrorWriteLog(string message, Exception exception)
+        public LoggerModel? InternalErrorWriteLog(string message, Exception? exception)
         {
             try
             {
                 var level = cconfig.InternalLogSettings.LogLevel;
-                if (level == LogLevelEnum.ERROR || level == LogLevelEnum.DEBUG)
+                if (level == LogLevelEnumeration.ERROR || level == LogLevelEnumeration.DEBUG)
                 {
-                    string excep = message ?? exception?.Message;
+                    string excep = message ?? exception?.Message ?? string.Empty;
                     LoggerModel model = new()
                     {
                         Date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, this.timeZone),
@@ -112,7 +113,7 @@ namespace ServeLog.InternalLogger
                         Level = "ERROR",
                         Logger = "Internal Logger",
                         Message = excep,
-                        Exception = exception?.StackTrace
+                        Exception = exception?.StackTrace ?? string.Empty
                     };
                     intData.WriteRecordInLog(model);
                     return model;

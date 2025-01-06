@@ -1,22 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Data.SqlClient;
-using WapiLogger.Models;
+﻿using Microsoft.Data.SqlClient;
+using ServeLog.Model;
+using System.Collections.Generic;
 
 namespace ServeLog.InternalLogger
 {
     /// <summary>
     /// Call the necessary services to Manage the log table
     /// </summary>
-    public class DataInternal : IDataInternal
+    public class DataInternal(CConfig xconfig) : IDataInternal
     {
-        private readonly string connString;
-        private readonly string table;
-
-        public DataInternal(CConfig xconfig)
-        {
-            this.connString = xconfig.InternalLoggerDb;
-            this.table = xconfig.InternalLogSettings.Table;
-        }
+        private readonly string connString = xconfig.InternalLoggerDb;
+        private readonly string table = xconfig.InternalLogSettings.Table ?? throw new KeyNotFoundException("Table for Logger can not be null");
 
         /// <summary>
         /// Write the log in the table. The table is selected by the
@@ -29,7 +23,7 @@ namespace ServeLog.InternalLogger
         public void WriteRecordInLog(LoggerModel model)
         {
             // Sanitarize Model
-            model = SatinizeLoggerModel.Execute(model);
+            model = SanitizeLoggerModel.Execute(model);
 
             // Prepare query
             var sql = $@"INSERT INTO {this.table} 
